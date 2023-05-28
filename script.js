@@ -2,11 +2,12 @@ let library = [];
 
 const btn = document.getElementById("addBookbtn");
 const form = document.querySelector("#bookForm");
-let k = 0;
 
 function showHideForm() {
   if (btn.innerText == "+") {
     btn.innerText = "x";
+    const gContainer = document.querySelector(".grid-container");
+    gContainer.classList.add("hideForm");
     form.classList.remove("hideForm");
     form.classList.add("showForm");
   } else {
@@ -14,6 +15,8 @@ function showHideForm() {
       btn.innerText = "+";
       form.classList.remove("showForm");
       form.classList.add("hideForm");
+      const gContainer = document.querySelector(".grid-container");
+      gContainer.classList.remove("hideForm");
     }
   }
 }
@@ -37,7 +40,6 @@ Book.prototype.info = function () {
 };
 
 Book.prototype.toggleReadStatus = function () {
-  console.log("toggle");
   if (this.isRead == "Yes") {
     this.isRead = "No";
   } else {
@@ -48,7 +50,12 @@ Book.prototype.toggleReadStatus = function () {
 const addBookForm = document.getElementById("bookForm");
 addBookForm.addEventListener("submit", (event) => {
   event.preventDefault();
-  addBookToLibrary();
+  const result = checkFields();
+  if (result == true) {
+    showHideForm();
+    addBookToLibrary();
+    document.getElementById("bookForm").reset();
+  }
 });
 
 function addBookToLibrary() {
@@ -66,36 +73,57 @@ function addBookToLibrary() {
 
   library.push(bookitem);
 
-  display(k);
-  k++;
+  display();
 }
 
-function display(k) {
+function display() {
+  const gridContainer = document.querySelector(".grid-container");
+  gridContainer.innerHTML = "";
   for (let i in library) {
-    decorate(library[i], k);
-    // library.pop(library[i]);
+    decorate(library[i], i);
   }
 }
 
 function decorate(bookitem, i) {
-  const jsonStringObject = JSON.stringify(bookitem);
   const gridContainer = document.querySelector(".grid-container");
-  const titleTag = document.createElement("p");
-  const strongElementItem = document.createElement("strong");
-  strongElementItem.innerText = "Title";
-  titleTag.appendChild(strongElementItem);
+
+  const titleTag = document.createElement("div");
+  const strongTitle = document.createElement("strong");
+  strongTitle.innerText = "Title";
+  titleTag.appendChild(strongTitle);
   titleTag.innerHTML += `: ${bookitem.title}`;
-  const authorTag = document.createElement("p");
-  authorTag.innerHTML = `Author: ${bookitem.author}`;
-  const pagesTag = document.createElement("p");
-  pagesTag.innerHTML = `Pages: ${bookitem.pages}`;
-  const statusTag = document.createElement("p");
-  statusTag.innerHTML = `Status: ${bookitem.isRead}`;
+
+  const authorTag = document.createElement("div");
+  const strongAuthor = document.createElement("strong");
+  strongAuthor.innerText = "Author";
+  authorTag.appendChild(strongAuthor);
+  authorTag.innerHTML += `: ${bookitem.author}`;
+
+  const pagesTag = document.createElement("div");
+  const strongPages = document.createElement("strong");
+  strongPages.innerText = "Pages";
+  pagesTag.appendChild(strongPages);
+  pagesTag.innerHTML += `: ${bookitem.pages}`;
+
+  const statusTag = document.createElement("div");
+  const strongStatus = document.createElement("strong");
+  strongStatus.innerText = "Status";
+  statusTag.appendChild(strongStatus);
+  statusTag.innerHTML += `: ${bookitem.isRead}`;
+
+  const bookDetailDiv = document.createElement("div");
+  bookDetailDiv.appendChild(titleTag);
+  bookDetailDiv.appendChild(authorTag);
+  bookDetailDiv.appendChild(pagesTag);
+  bookDetailDiv.appendChild(statusTag);
+
+  const btns = document.createElement("div");
+  btns.setAttribute("class", "delUpBtn");
 
   const toggleReadBtn = document.createElement("button");
   toggleReadBtn.setAttribute("class", "toggleButtonClass");
-  toggleReadBtn.innerText = "Update";
-  toggleReadBtn.setAttribute("onClick", `update(${bookitem.title})`);
+  toggleReadBtn.innerText = "Update read status";
+  toggleReadBtn.setAttribute("onClick", `update(${i})`);
 
   const breakElement = document.createElement("br");
 
@@ -103,37 +131,96 @@ function decorate(bookitem, i) {
   deleteButton.setAttribute("onClick", `deleteBtn(${i})`);
   deleteButton.setAttribute("class", "deleteButtonClass");
   deleteButton.setAttribute("id", i);
-  deleteButton.innerText = "Delete";
+  deleteButton.innerText = "Delete Book";
+
+  btns.appendChild(toggleReadBtn);
+  btns.appendChild(deleteButton);
 
   const newdivElement = document.createElement("div");
   newdivElement.className = "card";
+  if (bookitem.isRead == "Yes") {
+    newdivElement.classList.add("statusYes");
+    btns.classList.add("statusYes");
+    bookDetailDiv.classList.add("statusYes");
+  } else {
+    newdivElement.classList.add("statusNo");
+    btns.classList.add("statusNo");
+    bookDetailDiv.classList.add("statusNo");
+  }
   newdivElement.setAttribute("id", i);
-  newdivElement.appendChild(titleTag);
-  newdivElement.appendChild(authorTag);
-  newdivElement.appendChild(pagesTag);
-  newdivElement.appendChild(statusTag);
-  newdivElement.appendChild(deleteButton);
-  newdivElement.appendChild(breakElement);
-  newdivElement.appendChild(toggleReadBtn);
+  newdivElement.appendChild(bookDetailDiv);
+  newdivElement.appendChild(btns);
 
   gridContainer.appendChild(newdivElement);
 }
 
 function deleteBtn(i) {
+  console.log(i);
+  console.log(library);
   const gContainer = document.querySelector(".grid-container");
   const currentDiv = document.getElementById(i);
+
+  for (let k in library) {
+    if (k == i) {
+      library.splice(k, 1);
+    }
+  }
   gContainer.removeChild(currentDiv);
 }
 
-function update(title) {
-  console.log(library);
-  //   const bookobj = new Book(
-  //     bookitem.title,
-  //     bookitem.author,
-  //     bookitem.pages,
-  //     bookitem.status
-  //   );
-  //   bookobj.toggleReadStatus();
-  //   const divItem = document.getElementById(i);
-  //   divItem.children[3].innerText = `Status: ${bookobj.isRead}`;
+function update(i) {
+  for (let k in library) {
+    if (k == i) {
+      library[k].toggleReadStatus();
+    }
+  }
+
+  display();
+}
+
+const title = document.getElementById("title");
+const author = document.getElementById("author");
+const pages = document.getElementById("pages");
+const errorTitle = document.getElementById("errorTitle");
+const errorAuthor = document.getElementById("errorAuthor");
+const errorPages = document.getElementById("errorPages");
+
+function checkFields() {
+  let messages = [];
+
+  if (title.value === "" || title.value == null) {
+    errorTitle.innerText = "Please provide a title";
+    errorTitle.classList.add("showCard");
+    errorTitle.classList.remove("hideCard");
+    return false;
+  } else {
+    errorTitle.innerText = "";
+    errorTitle.classList.add("hideCard");
+    errorTitle.classList.remove("showCard");
+  }
+
+  if (author.value === "" || author.value == null) {
+    errorAuthor.innerText = "Please provide an author";
+    errorAuthor.classList.add("showCard");
+    errorAuthor.classList.remove("hideCard");
+    return false;
+  } else {
+    errorAuthor.innerText = "";
+    errorAuthor.classList.add("hideCard");
+    errorAuthor.classList.remove("showCard");
+  }
+
+  if (pages.value == "" || Number(pages.value) == 0) {
+    errorPages.innerText =
+      "Please provide the pages or add a value greater than 0";
+    errorPages.classList.add("showCard");
+    errorPages.classList.remove("hideCard");
+    return false;
+  } else {
+    errorPages.innerText = "";
+    errorPages.classList.add("hideCard");
+    errorPages.classList.remove("showCard");
+  }
+
+  return true;
 }

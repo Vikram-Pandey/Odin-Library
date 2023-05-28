@@ -9,30 +9,41 @@
   </head>
   <body>
     <div class="container">
-      <nav>Odin Library</nav>
-      <div>
-        <label for="plus">Add Books</label>
+      <nav class="navigation">Simple Odin Library without storage</nav>
+
+      <div class="addButton">
+        <label for="plus">Add Books </label>
         <button id="addBookbtn" type="button" onclick="showHideForm()">
           +
         </button>
       </div>
 
-      <form id="bookForm" class="hideForm" action="/index.html" method="post">
-        <label for="title">Title</label>
+      <form
+        id="bookForm"
+        class="formcss hideForm"
+        action="/index.html"
+        method="post"
+      >
+        <label for="title">Title *</label>
+        <div class="error hideCard" id="errorTitle"></div>
         <input
           type="text"
           id="title"
           placeholder="Enter Book title..."
           name="title"
         />
-        <label for="author">Author</label>
+
+        <label for="author">Author *</label>
+        <div class="error hideCard" id="errorAuthor"></div>
         <input
           type="text"
           id="author"
           placeholder="Enter Book's author name..."
           name="author"
         />
-        <label for="pages">Pages</label>
+
+        <label for="pages">Pages *</label>
+        <div class="error hideCard" id="errorPages"></div>
         <input
           type="number"
           id="pages"
@@ -41,28 +52,18 @@
         />
 
         <label for="Have you read the book?">Have you read the book?</label>
-        <select id="status" name="Have you read the book?">
+        <select id="status" name="Have you read the book?" required>
           <option value="Yes">Yes</option>
           <option value="No" selected>No</option>
         </select>
 
-        <button type="submit">Submit</button>
-        <button type="reset">Clear</button>
+        <button class="sbtnclass" id="sbtn" type="submit">Submit</button>
+        <button class="rbtnclass" id="rbtn" type="reset">Clear</button>
       </form>
 
-      <div class="grid-container">
-        <div class="card">
-          <p><strong>Title: </strong> Game of thrones</p>
-          <p><strong>Author: </strong>R.R. Martin</p>
-          <p><strong>Pages: </strong>295 pages</p>
-          <p><strong>Status: </strong>read</p>
-        </div>
-        <div class="card">Container 2</div>
-        <div class="card">Container 3</div>
-        <div class="card">Container 4</div>
-      </div>
+      <div class="grid-container"></div>
 
-      <footer>Made by Vikram</footer>
+      <footer class="footr">Made by Vikram</footer>
     </div>
     <script src="script.js"></script>
   </body>
